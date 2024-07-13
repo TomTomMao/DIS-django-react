@@ -19,7 +19,7 @@ class People(models.Model):
     last_name = models.CharField(max_length=50, null=False)
     address = models.CharField(max_length=50, blank=True, null=True)
     license = models.CharField(
-        max_length=16, unique=True, blank=True, null=True)
+        max_length=16, unique=False, blank=True, null=True, validators=[])
     dob = models.DateField(verbose_name='date of birth', blank=True, null=True)
 
     def __str__(self): return self.first_name + ' ' + self.last_name

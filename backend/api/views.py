@@ -1,8 +1,10 @@
 from django.shortcuts import render
 from rest_framework import generics
+from rest_framework.response import Response
+from rest_framework import status
 
-from api.models import People
-from api.serializers import PeopleSerializer
+from api.models import Ownership, People, Vehicle
+from api.serializers import OwnershipSerializer, PeopleSerializer
 from rest_framework.permissions import AllowAny
 from django.db.models.functions import Concat
 from django.db.models import Value, Q
@@ -29,4 +31,16 @@ class PeopleList(generics.ListAPIView):
         else:
             queryset = People.objects.all().filter(
                 Q(first_name__iexact=name) | Q(last_name__iexact=name))
+        return queryset
+
+class OwnershipListCreate(generics.ListCreateAPIView):
+    serializer_class = OwnershipSerializer
+    permission_classes = [AllowAny]
+    
+    def get_queryset(self):
+        queryset = Ownership.objects.all()
+        plate_number = self.request.query_params.get('plate_number', None)
+        if plate_number:
+            queryset = queryset.filter(vehicle__plate_number__iexact=plate_number)
+        
         return queryset
