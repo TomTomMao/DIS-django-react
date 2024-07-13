@@ -9,7 +9,7 @@ class Vehicle(models.Model):
     make = models.CharField(max_length=20, null=False)
     model = models.CharField(max_length=20, null=False)
     color = models.CharField(max_length=20, null=False)
-    plate_number = models.CharField(max_length=7, null=False)
+    plate_number = models.CharField(max_length=7, blank=True, null=True)
 
     def __str__(self): return self.plate_number
 
