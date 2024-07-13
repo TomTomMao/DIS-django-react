@@ -1,11 +1,10 @@
 from django.db import models
-
+from django.contrib.auth.models import User
 # Create your models here.
 
 
 # This Python class defines a Vehicle model with attributes for make, model, colour, and licence.
 class Vehicle(models.Model):
-
     make = models.CharField(max_length=20, null=False)
     model = models.CharField(max_length=20, null=False)
     color = models.CharField(max_length=20, null=False)
@@ -28,8 +27,8 @@ class Ownership(models.Model):
 
 class Offense(models.Model):
     description = models.CharField(max_length=50, null=False)
-    max_fine = models.IntegerField(max_length=11, null=False)
-    max_points = models.IntegerField(max_length=11, null=False)
+    max_fine = models.IntegerField(null=False)
+    max_points = models.IntegerField(null=False)
 
 
 class Incident(models.Model):
@@ -37,13 +36,13 @@ class Incident(models.Model):
         'Ownership', on_delete=models.PROTECT, null=True)
     people = models.ForeignKey('People', on_delete=models.PROTECT, null=True)
     offense = models.ForeignKey('Offense', on_delete=models.PROTECT)
-    creator = models.ForeignKey('User', on_delete=models.PROTECT, null=False)
+    creator = models.ForeignKey(User, on_delete=models.PROTECT, null=False)
     date = models.DateField(null=False)
     report = models.CharField(max_length=500, null=False)
-    
+
 
 class Fines(models.Model):
-    amount = models.IntegerField(max_length=20, null=False)
-    points = models.IntegerField(max_length=20, null=False)
+    amount = models.IntegerField(null=False)
+    points = models.IntegerField(null=False)
     incident = models.OneToOneField(
         'Incident', on_delete=models.CASCADE, null=False)
