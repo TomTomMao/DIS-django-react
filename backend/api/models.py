@@ -56,10 +56,12 @@ class Incident(models.Model):
     def __str__(self):
         return 'id:' + str(self.id)
 
+
 class Fine(models.Model):
     amount = models.IntegerField(null=False)
     points = models.IntegerField(null=False)
     incident = models.OneToOneField(
         'Incident', on_delete=models.CASCADE, null=False)
+
     def __str__(self):
         return f"{self.amount}$ point: {self.points}"
