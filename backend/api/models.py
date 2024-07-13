@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.forms import ValidationError
 # Create your models here.
 
 
@@ -16,15 +17,17 @@ class Vehicle(models.Model):
 class People(models.Model):
     first_name = models.CharField(max_length=50, null=False)
     last_name = models.CharField(max_length=50, null=False)
-    address = models.CharField(max_length=50, null=True)
-    license = models.CharField(max_length=16, unique=True, null=True)
-    dob = models.DateField(verbose_name='date of birth', null=True)
+    address = models.CharField(max_length=50, blank=True, null=True)
+    license = models.CharField(
+        max_length=16, unique=True, blank=True, null=True)
+    dob = models.DateField(verbose_name='date of birth', blank=True, null=True)
 
     def __str__(self): return self.first_name + ' ' + self.last_name
 
 
 class Ownership(models.Model):
-    people = models.ForeignKey('People', on_delete=models.PROTECT, null=True)
+    people = models.ForeignKey(
+        'People', on_delete=models.PROTECT, blank=True, null=True)
     vehicle = models.ForeignKey(
         'Vehicle', on_delete=models.PROTECT, null=False)
 
@@ -46,8 +49,9 @@ class Offense(models.Model):
 
 class Incident(models.Model):
     ownership = models.ForeignKey(
-        'Ownership', on_delete=models.PROTECT, null=True)
-    people = models.ForeignKey('People', on_delete=models.PROTECT, null=True)
+        'Ownership', on_delete=models.PROTECT, blank=True, null=True)
+    people = models.ForeignKey(
+        'People', on_delete=models.PROTECT, blank=True, null=True)
     offense = models.ForeignKey('Offense', on_delete=models.PROTECT)
     creator = models.ForeignKey(User, on_delete=models.PROTECT, null=False)
     date = models.DateField(null=False)
@@ -55,6 +59,11 @@ class Incident(models.Model):
 
     def __str__(self):
         return 'id:' + str(self.id)
+    
+    def clean(self):
+        super().clean()
+        if self.ownership is None and self.people is None:
+            raise ValidationError('Ownership and People are both None')
 
 
 class Fine(models.Model):
