@@ -9,7 +9,7 @@ class Vehicle(models.Model):
     make = models.CharField(max_length=20, null=True)
     model = models.CharField(max_length=20, null=True)
     color = models.CharField(max_length=20, null=True)
-    license = models.CharField(max_length=7, null=True)
+    plateNumber = models.CharField(max_length=7, null=True)
 
 
 class People(models.Model):
