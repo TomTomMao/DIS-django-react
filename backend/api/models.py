@@ -41,7 +41,7 @@ class Incident(models.Model):
     report = models.CharField(max_length=500, null=False)
 
 
-class Fines(models.Model):
+class Fine(models.Model):
     amount = models.IntegerField(null=False)
     points = models.IntegerField(null=False)
     incident = models.OneToOneField(
