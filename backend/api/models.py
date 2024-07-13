@@ -59,7 +59,7 @@ class Incident(models.Model):
 
     def __str__(self):
         return 'id:' + str(self.id)
-    
+
     def clean(self):
         super().clean()
         if self.ownership is None and self.people is None:
@@ -74,3 +74,10 @@ class Fine(models.Model):
 
     def __str__(self):
         return f"{self.amount}$ point: {self.points}"
+
+    def clean(self):
+        super().clean()
+        if self.amount > self.incident.offense.max_fine:
+            raise ValidationError('fine amount greater than max fine')
+        if self.points > self.incident.offense.max_points:
+            raise ValidationError('point amount greater than max point')
