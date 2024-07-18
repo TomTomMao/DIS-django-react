@@ -17,22 +17,29 @@ class PeopleList(generics.ListAPIView):
     permission_classes = [AllowAny]
 
     def get_queryset(self):
+        queryset = People.objects.all()
         name = self.request.query_params.get('name')
         license = self.request.query_params.get('license')
-        if name is None and license is None:
-            queryset = People.objects.all()
-        elif name is not None and license is not None:
-            queryset = []
+        if name is not None:
+            if license is not None: # invalid search
+                queryset = []
+            elif name == '':
+                queryset = People.objects.all()
+            elif ' ' in name:  # full name search
+                queryset = People.objects.annotate(
+                    full_name=Concat('first_name', Value(' '), 'last_name')).filter(full_name__iexact=name)
+            else: # partial name search
+                queryset = People.objects.all().filter(
+                    Q(first_name__iexact=name) | Q(last_name__iexact=name))
         elif license is not None:
-            queryset = People.objects.filter(license__iexact=license)
-        elif ' ' in name:
-            queryset = People.objects.annotate(
-                full_name=Concat('first_name', Value(' '), 'last_name')).filter(full_name__iexact=name)
-        else:
-            queryset = People.objects.all().filter(
-                Q(first_name__iexact=name) | Q(last_name__iexact=name))
+            if name is not None: # invalid search
+                queryset = []
+            elif license == '':
+                queryset = People.objects.all()
+            else:
+                queryset = People.objects.filter(license__iexact=license)
+                
         return queryset
-
 
 class OwnershipListCreate(generics.ListCreateAPIView):
     serializer_class = OwnershipSerializer
