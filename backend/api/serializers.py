@@ -1,11 +1,15 @@
 from rest_framework import serializers
-from .models import People, Vehicle, Ownership
+from .models import Incident, Offense, People, Vehicle, Ownership
+from django.contrib.auth.models import User
 
 
 class PeopleSerializer(serializers.ModelSerializer):
     class Meta:
         model = People
         fields = ['id', 'first_name', 'last_name', 'address', 'license', 'dob']
+        extra_kwargs = {'license': {
+            'validators': []
+        }}
 
 
 class VehicleSerializer(serializers.ModelSerializer):
@@ -16,42 +20,35 @@ class VehicleSerializer(serializers.ModelSerializer):
 
 class OwnershipSerializer(serializers.ModelSerializer):
     people = PeopleSerializer(required=False, allow_null=True)
-    vehicle = VehicleSerializer()
+    vehicle = VehicleSerializer(required=False, allow_null=True)
 
     class Meta:
         model = Ownership
         fields = '__all__'
 
+
+class OffenseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Offense
+        fields = ['__all__']
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "username", "password"]
+        extra_kwargs = {"password": {"write_only": True}}
+
     def create(self, validated_data):
-        people_data = validated_data.pop('people')
-        vehicle_data = validated_data.pop('vehicle')
-        # check if a people instance with the same detail exists
-        if people_data is None:
-            vehicle = Vehicle.objects.create(**vehicle_data)
-            ownership = Ownership.objects.create(
-                vehicle=vehicle, **validated_data)
-            return ownership
+        user = User.objects.create_user(**validated_data)
+        return user
 
-        people_instance = People.objects.filter(
-            first_name=people_data['first_name'],
-            last_name=people_data['last_name'],
-            address=people_data['address'],
-            dob=people_data['dob']
-        ).first()
 
-        if people_instance:
-            people = people_instance
-        else:
-            people_instance = People.objects.filter(
-                license=people_data['license']).first()
-            if (people_instance):
-                people = people_instance
-            else:
-                people = People.objects.create(**people_data)
+class IncidentSerializer(serializers.ModelSerializer):
+    ownership = OwnershipSerializer()
+    offense = serializers.PrimaryKeyRelatedField(queryset=Offense.objects.all())
+    # creator = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
 
-        vehicle = Vehicle.objects.create(**vehicle_data)
-
-        ownership = Ownership.objects.create(
-            people=people, vehicle=vehicle, **validated_data)
-
-        return ownership
+    class Meta:
+        model = Incident
+        fields = '__all__'

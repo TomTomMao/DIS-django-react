@@ -19,7 +19,7 @@ class People(models.Model):
     last_name = models.CharField(max_length=50, null=False)
     address = models.CharField(max_length=50, blank=True, null=True)
     license = models.CharField(
-        max_length=16, unique=False, blank=True, null=True, validators=[])
+        max_length=16, unique=True, blank=True, null=True)
     dob = models.DateField(verbose_name='date of birth', blank=True, null=True)
 
     def __str__(self): return self.first_name + ' ' + self.last_name
@@ -29,8 +29,14 @@ class Ownership(models.Model):
     people = models.ForeignKey(
         'People', on_delete=models.PROTECT, blank=True, null=True)
     vehicle = models.ForeignKey(
-        'Vehicle', on_delete=models.PROTECT, null=False)
+        'Vehicle', on_delete=models.PROTECT, blank=True, null=True)
 
+    def clean(self) -> None:
+        super().clean()
+        if self.people is None and self.vehicle is None:
+            ValidationError('Vehicle and People are both None')
+
+    
     def __str__(self): return self.people.__str__() + \
         ' - ' + self.vehicle.__str__()
 
@@ -50,20 +56,13 @@ class Offense(models.Model):
 class Incident(models.Model):
     ownership = models.ForeignKey(
         'Ownership', on_delete=models.PROTECT, blank=True, null=True)
-    people = models.ForeignKey(
-        'People', on_delete=models.PROTECT, blank=True, null=True)
     offense = models.ForeignKey('Offense', on_delete=models.PROTECT)
-    creator = models.ForeignKey(User, on_delete=models.PROTECT, null=False)
+    # creator = models.ForeignKey(User, on_delete=models.PROTECT, null=False)
     date = models.DateField(null=False)
     report = models.CharField(max_length=500, null=False)
 
     def __str__(self):
         return 'id:' + str(self.id)
-
-    def clean(self):
-        super().clean()
-        if self.ownership is None and self.people is None:
-            raise ValidationError('Ownership and People are both None')
 
 
 class Fine(models.Model):
