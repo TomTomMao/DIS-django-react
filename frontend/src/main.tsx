@@ -5,9 +5,9 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-import { BrowserRouter, createBrowserRouter, createRoutesFromElements, Route, RouterProvider, Routes } from 'react-router-dom';
+import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router-dom';
 import People, { loader as peopleLoader } from './routes/people'
-import Ownership from './routes/ownership.tsx';
+import Ownership, {action as ownershipAction} from './routes/ownership.tsx';
 import Root from './routes/root.tsx';
 import Vehicle, { loader as vehicleLoader } from './routes/vehicle.tsx';
 import './index.css'
@@ -36,6 +36,7 @@ const router = createBrowserRouter(
       ></Route>
       <Route
         path='/ownership'
+        action={ownershipAction}
         element={
           <Ownership />
         }

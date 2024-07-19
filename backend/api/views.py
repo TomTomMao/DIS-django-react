@@ -55,6 +55,7 @@ class OwnershipListCreate(generics.ListCreateAPIView):
         return queryset
 
     def perform_create(self, serializer):
+        print(self.request.data)
         people, created = get_or_create_people(self.request.data)
         vehicle, created = get_or_create_vehicle(self.request.data)
 
@@ -80,7 +81,7 @@ class IncidentListCreate(generics.ListCreateAPIView):
 
 
 def get_or_create_people(data):
-    people_data = data.get('ownership').get('people')
+    people_data = data.get('people')
     if people_data is None:
         people = None
         created = False
@@ -97,7 +98,7 @@ def get_or_create_people(data):
 
 
 def get_or_create_vehicle(data):
-    vehicle_data = data.get('ownership').get('vehicle')
+    vehicle_data = data.get('vehicle')
     if vehicle_data is None:
         print('vehicle_data is none')
         vehicle = None
