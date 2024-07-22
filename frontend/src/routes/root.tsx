@@ -12,7 +12,11 @@ const menuItems = [
     { text: 'Home', linkTo: '/' },
     { text: 'Search People', linkTo: '/people' },
     { text: 'Search Vehicle', linkTo: '/vehicle' },
-    { text: 'Ownership', linkTo:'/ownership'}
+    { text: 'Ownership', linkTo: '/ownership' }
+]
+
+const menuItems2 = [
+    { text: 'Logout', linkTo: '/Logout' },
 ]
 const Root = () => {
     const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -40,7 +44,7 @@ const Root = () => {
             <List>
                 {menuItems.map(({ text, linkTo }, index) => (
                     <Link key={text} to={linkTo}>
-                        <ListItem  disablePadding>
+                        <ListItem disablePadding>
                             <ListItemButton>
                                 <ListItemIcon>
                                     {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
@@ -53,15 +57,17 @@ const Root = () => {
             </List>
             <Divider />
             <List>
-                {['All mail', 'Trash', 'Spam'].map((text, index) => (
-                    <ListItem key={text} disablePadding>
-                        <ListItemButton>
-                            <ListItemIcon>
-                                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                            </ListItemIcon>
-                            <ListItemText primary={text} />
-                        </ListItemButton>
-                    </ListItem>
+                {menuItems2.map(({ text, linkTo }, index) => (
+                    <Link key={text} to={linkTo}>
+                        <ListItem disablePadding>
+                            <ListItemButton>
+                                <ListItemIcon>
+                                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                                </ListItemIcon>
+                                <ListItemText primary={text} />
+                            </ListItemButton>
+                        </ListItem>
+                    </Link>
                 ))}
             </List>
         </div>

@@ -1,11 +1,12 @@
 from django.shortcuts import render
+from django.contrib.auth.models import User
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
 
 from api.models import Incident, Offense, Ownership, People, Vehicle
-from api.serializers import IncidentSerializer, OwnershipSerializer, PeopleSerializer
-from rest_framework.permissions import AllowAny
+from api.serializers import IncidentSerializer, OwnershipSerializer, PeopleSerializer, UserSerializer
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.db.models.functions import Concat
 from django.db.models import Value, Q
 
@@ -14,7 +15,7 @@ from django.db.models import Value, Q
 
 class PeopleList(generics.ListAPIView):
     serializer_class = PeopleSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         queryset = People.objects.all()
@@ -43,7 +44,7 @@ class PeopleList(generics.ListAPIView):
 
 class OwnershipListCreate(generics.ListCreateAPIView):
     serializer_class = OwnershipSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         queryset = Ownership.objects.all()
@@ -64,7 +65,7 @@ class OwnershipListCreate(generics.ListCreateAPIView):
 
 class IncidentListCreate(generics.ListCreateAPIView):
     serializer_class = IncidentSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     queryset = Incident.objects.all()
 
     def perform_create(self, serializer):
@@ -110,3 +111,7 @@ def get_or_create_vehicle(data):
             color=vehicle_data['color'],
             plate_number=vehicle_data['plate_number'])
     return vehicle, created
+class CreateUserView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [AllowAny]
